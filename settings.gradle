@@ -1,0 +1,6 @@
+rootProject.name = 'spring-cloud'
+include 'discovery-server'
+include 'first-service'
+include 'second-service'
+include 'user-service'
+include 'gateway'
