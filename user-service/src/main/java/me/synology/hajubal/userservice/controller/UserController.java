@@ -1,8 +1,10 @@
 package me.synology.hajubal.userservice.controller;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.synology.hajubal.userservice.dto.UserDto;
+import me.synology.hajubal.userservice.repository.UserEntity;
 import me.synology.hajubal.userservice.service.UserService;
 import me.synology.hajubal.userservice.vo.Greeting;
 import me.synology.hajubal.userservice.vo.RequestUser;
@@ -15,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,12 +36,30 @@ public class UserController {
     private final Greeting greeting;
 
     @GetMapping("/health_check")
+    @Timed(value="users.status", longTask = true)
     public String status() {
-        return String.format("It's working. %s", env.getProperty("local.server.port"));
+        return String.format("It's Working in User Service"
+                + ", port(local.server.port)=" + env.getProperty("local.server.port")
+                + ", port(server.port)=" + env.getProperty("server.port")
+                + ", gateway ip=" + env.getProperty("gateway.ip")
+                + ", message=" + env.getProperty("greeting.message")
+                + ", token secret=" + env.getProperty("token.secret")
+                + ", token expiration time=" + env.getProperty("token.expiration_time"));
     }
 
     @GetMapping("/welcome")
-    public String welcome() {
+    @Timed(value="users.welcome", longTask = true)
+    public String welcome(HttpServletRequest request, HttpServletResponse response) {
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies != null) {
+//            Arrays.stream(cookies).forEach(cookie -> {
+//                System.out.print(cookie.getName() + "=" + cookie.getValue());
+//            });
+//        }
+//        Cookie c1 = new Cookie("myuser_token", "abcd1234");
+//        response.addCookie(c1);
+
+//        return env.getProperty("greeting.message");
         return greeting.getMessage();
     }
 
@@ -46,7 +69,6 @@ public class UserController {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         UserDto userDto = mapper.map(user, UserDto.class);
-
         userService.createUser(userDto);
 
         ResponseUser responseUser = mapper.map(userDto, ResponseUser.class);
@@ -55,14 +77,23 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<ResponseUser>> userList() {
+    public ResponseEntity<List<ResponseUser>> getUsers() {
         List<UserDto> userList = userService.findAll();
 
-        ModelMapper mapper = new ModelMapper();
+        List<ResponseUser> result = new ArrayList<>();
+        userList.forEach(v -> {
+            result.add(new ModelMapper().map(v, ResponseUser.class));
+        });
 
-        List<ResponseUser> collect = userList.stream().map(userDto -> mapper.map(userDto, ResponseUser.class))
-                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
 
-        return ResponseEntity.status(HttpStatus.OK).body(collect);
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<ResponseUser> getUser(@PathVariable("userId") String userId) {
+        UserDto userDto = userService.getUserByUserId(userId);
+
+        ResponseUser returnValue = new ModelMapper().map(userDto, ResponseUser.class);
+
+        return ResponseEntity.status(HttpStatus.OK).body(returnValue);
     }
 }

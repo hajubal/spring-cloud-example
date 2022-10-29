@@ -24,17 +24,13 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+@RequiredArgsConstructor
 @Slf4j
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private Environment env;
+    private final Environment env;
 
-    private UserService userService;
-
-    public AuthenticationFilter(Environment env, UserService userService) {
-        this.env = env;
-        this.userService = userService;
-    }
+    private final UserService userService;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {

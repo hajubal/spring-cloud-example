@@ -33,6 +33,7 @@ public class SecurityConfig {
         return http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/users/**").permitAll()
+                .antMatchers("/actuator/**").permitAll()
 //                .antMatchers("/**")
 //                .hasIpAddress("127.0.0.1")
                 .and()
