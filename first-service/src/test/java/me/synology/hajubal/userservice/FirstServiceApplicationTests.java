@@ -1,6 +1,5 @@
-package me.synology.hajubal.discoveryservice;
+package me.synology.hajubal.userservice;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
