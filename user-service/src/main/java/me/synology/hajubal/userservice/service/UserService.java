@@ -11,6 +11,7 @@ import me.synology.hajubal.userservice.repository.UserRepository;
 import me.synology.hajubal.userservice.vo.ResponseOrder;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.User;
@@ -26,18 +27,25 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private final Environment env;
+    @Autowired
+    private Environment env;
 
-    private final OrderServiceClient orderServiceClient;
+    @Autowired
+    private OrderServiceClient orderServiceClient;
 
-    private final CircuitBreakerFactory circuitBreakerFactory;
+    @Autowired
+    private CircuitBreakerFactory circuitBreakerFactory;
+
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
     public UserDto createUser(UserDto userDto) {
         userDto.setUserId(UUID.randomUUID().toString());

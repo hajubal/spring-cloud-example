@@ -19,6 +19,21 @@ spring:
             preLogger: true
             postLogger: true
       routes:
+        - id: simple-security
+          uri: lb://SIMPLE-SECURITY
+          predicates:
+            - Path=/sec/login
+            - Method=POST
+          filters:
+            - RewritePath=/sec/(?<segment>.*), /sec/$\{segment}
+            - RewriteLocationResponseHeader=ALWAYS_STRIP, Location, localhost:8000/sec,
+        - id: simple-security
+          uri: lb://SIMPLE-SECURITY
+          predicates:
+            - Path=/sec/**
+          filters:
+            - RewritePath=/sec/(?<segment>.*), /$\{segment}
+            - RewriteLocationResponseHeader=ALWAYS_STRIP, Location, localhost:8000/sec,
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
