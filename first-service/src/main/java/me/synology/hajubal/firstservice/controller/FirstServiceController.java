@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/first-service")
 @RestController
 public class FirstServiceController {
 
@@ -35,5 +34,10 @@ public class FirstServiceController {
         log.info("Server port={}", request.getServerPort());
 
         return String.format("Hi, there. This is a message form First Service. %s", env.getProperty("local.server.port"));
+    }
+
+    @GetMapping("/ok")
+    public String ok() {
+        return "ok";
     }
 }

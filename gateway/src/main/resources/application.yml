@@ -19,22 +19,6 @@ spring:
             preLogger: true
             postLogger: true
       routes:
-        - id: simple-security
-          uri: lb://SIMPLE-SECURITY
-          predicates:
-            - Path=/sec/login
-            - Method=POST
-          filters:
-            #302 location 값 변경. security에서 로그인 페이지로 302로 redirect 시킬 때 해당 서비스의 url로 설정하기 때문에
-            #강제로 변경이 필요
-            - RewriteLocationResponseHeader=ALWAYS_STRIP, Location, localhost:8000/sec,
-        - id: simple-security
-          uri: lb://SIMPLE-SECURITY
-          predicates:
-            - Path=/sec/**
-          filters:
-            - RewritePath=/sec/(?<segment>.*), /$\{segment}
-            - RewriteLocationResponseHeader=ALWAYS_STRIP, Location, localhost:8000/sec,
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
@@ -64,6 +48,7 @@ spring:
           filters:
 #            - AddRequestHeader=first-request, first-request-header2
 #            - AddResponseHeader=first-response, first-response-header2
+            - RewritePath=/first-service/(?<segment>.*), /$\{segment}
             - CustomFilter
         - id: second-service
           uri: lb://SECOND-SERVICE
