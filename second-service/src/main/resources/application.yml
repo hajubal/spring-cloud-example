@@ -5,6 +5,12 @@ spring:
   application:
     name: second-service
 
+feign:
+  httpclient:
+    connection-timeout: 2000
+  okhttp:
+    enabled: true
+
 eureka:
   instance:
     instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}

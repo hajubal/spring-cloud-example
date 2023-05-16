@@ -38,6 +38,8 @@ public class FirstServiceController {
 
     @GetMapping("/ok")
     public String ok() {
+        log.info("ok called.");
+
         return "ok";
     }
 }
