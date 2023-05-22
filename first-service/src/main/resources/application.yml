@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: first-service
+  redis:
+    host: 127.0.0.1
+    port: 6379
 
 eureka:
   instance:
